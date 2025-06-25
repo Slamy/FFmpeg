@@ -120,6 +120,8 @@ DECLARE_ALIGNED(16, MPA_INT, RENAME(ff_mpa_synth_window))[512+256];
     op2(sum2, (w2)[7 * 64], tmp);\
 }
 
+void print_str(const char *p);
+
 void RENAME(ff_mpadsp_apply_window)(MPA_INT *synth_buf, MPA_INT *window,
                                   int *dither_state, OUT_INT *samples,
                                   ptrdiff_t incr)
@@ -173,6 +175,9 @@ void RENAME(ff_mpadsp_apply_window)(MPA_INT *synth_buf, MPA_INT *window,
     *dither_state= sum;
 }
 
+//static int OUT_DEBUG;
+#define OUT_DEBUG *(volatile uint32_t *)0x10000030
+
 /* 32 sub band synthesis filter. Input: 32 sub band samples, Output:
    32 samples. */
 void RENAME(ff_mpa_synth_filter)(MPADSPContext *s, MPA_INT *synth_buf_ptr,
@@ -187,9 +192,16 @@ void RENAME(ff_mpa_synth_filter)(MPADSPContext *s, MPA_INT *synth_buf_ptr,
     offset = *synth_buf_offset;
     synth_buf = synth_buf_ptr + offset;
 
-    s->RENAME(dct32)(synth_buf, sb_samples);
+#ifndef __linux__ 
+    OUT_DEBUG=20;
+    s->RENAME(dct32)((int*)synth_buf, (int*)sb_samples);
+    OUT_DEBUG=21;
     s->RENAME(apply_window)(synth_buf, window, dither_state, samples, incr);
-
+    OUT_DEBUG=22;
+#else
+    s->RENAME(dct32)((int*)synth_buf, (int*)sb_samples);
+    s->RENAME(apply_window)(synth_buf, window, dither_state, samples, incr);
+#endif
     offset = (offset - 32) & 511;
     *synth_buf_offset = offset;
 }

@@ -55,11 +55,7 @@ void ff_mpa_synth_filter_fixed(MPADSPContext *s,
                                int16_t *samples, ptrdiff_t incr,
                                int32_t *sb_samples);
 
-void ff_mpa_synth_filter_float(MPADSPContext *s,
-                               float *synth_buf_ptr, int *synth_buf_offset,
-                               float *window, int *dither_state,
-                               float *samples, ptrdiff_t incr,
-                               float *sb_samples);
+
 
 void ff_mpadsp_init_aarch64(MPADSPContext *s);
 void ff_mpadsp_init_arm(MPADSPContext *s);

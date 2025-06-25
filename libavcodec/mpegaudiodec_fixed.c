@@ -105,35 +105,3 @@ const FFCodec ff_mp3_decoder = {
     CODEC_SAMPLEFMTS(AV_SAMPLE_FMT_S16P, AV_SAMPLE_FMT_S16),
 };
 #endif
-#if CONFIG_MP3ADU_DECODER
-const FFCodec ff_mp3adu_decoder = {
-    .p.name         = "mp3adu",
-    CODEC_LONG_NAME("ADU (Application Data Unit) MP3 (MPEG audio layer 3)"),
-    .p.type         = AVMEDIA_TYPE_AUDIO,
-    .p.id           = AV_CODEC_ID_MP3ADU,
-    .priv_data_size = sizeof(MPADecodeContext),
-    .init           = decode_init,
-    FF_CODEC_DECODE_CB(decode_frame_adu),
-    .p.capabilities = AV_CODEC_CAP_CHANNEL_CONF |
-                      AV_CODEC_CAP_DR1,
-    .flush          = flush,
-    CODEC_SAMPLEFMTS(AV_SAMPLE_FMT_S16P, AV_SAMPLE_FMT_S16),
-};
-#endif
-#if CONFIG_MP3ON4_DECODER
-const FFCodec ff_mp3on4_decoder = {
-    .p.name         = "mp3on4",
-    CODEC_LONG_NAME("MP3onMP4"),
-    .p.type         = AVMEDIA_TYPE_AUDIO,
-    .p.id           = AV_CODEC_ID_MP3ON4,
-    .priv_data_size = sizeof(MP3On4DecodeContext),
-    .init           = decode_init_mp3on4,
-    .close          = decode_close_mp3on4,
-    FF_CODEC_DECODE_CB(decode_frame_mp3on4),
-    .p.capabilities = AV_CODEC_CAP_CHANNEL_CONF |
-                      AV_CODEC_CAP_DR1,
-    .flush          = flush_mp3on4,
-    CODEC_SAMPLEFMTS(AV_SAMPLE_FMT_S16P),
-    .caps_internal  = FF_CODEC_CAP_INIT_CLEANUP,
-};
-#endif

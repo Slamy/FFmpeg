@@ -886,24 +886,6 @@ static void imdct36_mips_fixed(int *out, int *buf, int *in, int *win)
     );
 }
 
-static void ff_imdct36_blocks_mips_fixed(int *out, int *buf, int *in,
-                               int count, int switch_point, int block_type)
-{
-    int j;
-    for (j=0 ; j < count; j++) {
-        /* apply window & overlap with previous buffer */
-
-        /* select window */
-        int win_idx = (switch_point && j < 2) ? 0 : block_type;
-        int *win = ff_mdct_win_fixed[win_idx + (4 & -(j & 1))];
-
-        imdct36_mips_fixed(out, buf, in, win);
-
-        in  += 18;
-        buf += ((j&3) != 3 ? 1 : (72-3));
-        out++;
-    }
-}
 
 #endif /* !HAVE_MIPS32R6 && !HAVE_MIPS64R6 */
 #endif /* HAVE_INLINE_ASM */
@@ -913,7 +895,6 @@ void ff_mpadsp_init_mipsdsp(MPADSPContext *s)
 #if HAVE_INLINE_ASM
 #if !HAVE_MIPS32R6 && !HAVE_MIPS64R6
     s->apply_window_fixed   = ff_mpadsp_apply_window_mips_fixed;
-    s->imdct36_blocks_fixed = ff_imdct36_blocks_mips_fixed;
 #endif
 #endif
 }

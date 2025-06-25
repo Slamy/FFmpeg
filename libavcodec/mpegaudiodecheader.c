@@ -97,23 +97,24 @@ int avpriv_mpegaudio_decode_header(MPADecodeHeader *s, uint32_t header)
         /* if no frame size computed, signal it */
         return 1;
     }
-
 #if defined(DEBUG)
-    ff_dlog(NULL, "layer%d, %d Hz, %d kbits/s, ",
+
+    printf("layer%d, %d Hz, %d kbits/s, ",
            s->layer, s->sample_rate, s->bit_rate);
     if (s->nb_channels == 2) {
         if (s->layer == 3) {
             if (s->mode_ext & MODE_EXT_MS_STEREO)
-                ff_dlog(NULL, "ms-");
+                printf("ms-");
             if (s->mode_ext & MODE_EXT_I_STEREO)
-                ff_dlog(NULL, "i-");
+            printf( "i-");
         }
-        ff_dlog(NULL, "stereo");
+        printf( "stereo");
     } else {
-        ff_dlog(NULL, "mono");
+        printf( "mono");
     }
-    ff_dlog(NULL, "\n");
-#endif
+    printf( "\n");
+    #endif
+
     return 0;
 }
 

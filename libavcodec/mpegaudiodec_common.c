@@ -64,9 +64,6 @@ const uint8_t ff_lsf_nsf_table[6][3][4] = {
 };
 
 /* mpegaudio layer 3 huffman tables */
-const VLCElem *ff_huff_vlc[16];
-static VLCElem huff_vlc_tables[128 + 128 + 128 + 130 + 128 + 154 + 166 + 142 +
-                               204 + 190 + 170 + 542 + 460 + 662 + 414];
 VLC ff_huff_quad_vlc[2];
 static VLCElem huff_quad_vlc_tables[64 + 16];
 
@@ -399,11 +396,14 @@ const uint8_t ff_mpa_pretab[2][22] = {
     { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 3, 3, 3, 2, 0 },
 };
 
+void print_str(const char *p);
+
 static av_cold void mpegaudiodec_common_init_static(void)
 {
-    VLCInitState state = VLC_INIT_STATE(huff_vlc_tables);
     const uint8_t *huff_sym = mpa_huffsymbols, *huff_lens = mpa_hufflens;
     int offset;
+
+    print_str("6\n");
 
     /* scale factors table for layer 1/2 */
     for (int i = 0; i < 64; i++) {
@@ -413,26 +413,8 @@ static av_cold void mpegaudiodec_common_init_static(void)
         mod   = i % 3;
         ff_scale_factor_modshift[i] = mod | (shift << 2);
     }
+    print_str("7\n");
 
-    /* huffman decode tables */
-    for (int i = 0; i < 15;) {
-        uint16_t tmp_symbols[256];
-        int nb_codes_minus_one = mpa_huff_sizes_minus_one[i];
-        int j;
-
-        for (j = 0; j <= nb_codes_minus_one; j++) {
-            uint8_t high = huff_sym[j] & 0xF0, low = huff_sym[j] & 0xF;
-
-            tmp_symbols[j] = high << 1 | ((high && low) << 4) | low;
-        }
-
-        ff_huff_vlc[++i] = ff_vlc_init_tables_from_lengths(&state, 7, j,
-                                                           huff_lens, 1,
-                                                           tmp_symbols, 2, 2,
-                                                           0, 0);
-        huff_lens += j;
-        huff_sym  += j;
-    }
     av_assert1(state.size == 0);
 
     offset = 0;
@@ -445,16 +427,9 @@ static av_cold void mpegaudiodec_common_init_static(void)
                  mpa_quad_bits[i], 1, 1, mpa_quad_codes[i], 1, 1,
                  VLC_INIT_USE_STATIC);
     }
-    av_assert0(offset == FF_ARRAY_ELEMS(huff_quad_vlc_tables));
+    print_str("8\n");
 
-    for (int i = 0; i < 9; i++) {
-        int k = 0;
-        for (int j = 0; j < 22; j++) {
-            ff_band_index_long[i][j] = k;
-            k += ff_band_size_long[i][j] >> 1;
-        }
-        ff_band_index_long[i][22] = k;
-    }
+    av_assert0(offset == FF_ARRAY_ELEMS(huff_quad_vlc_tables));
 
     for (int i = 0; i < 4; i++) {
         if (ff_mpa_quant_bits[i] < 0) {
@@ -470,7 +445,7 @@ static av_cold void mpegaudiodec_common_init_static(void)
             }
         }
     }
-    mpegaudiodec_common_tableinit();
+    print_str("9\n");
 }
 
 av_cold void ff_mpegaudiodec_common_init_static(void)
