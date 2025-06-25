@@ -358,29 +358,7 @@ static void imdct12(INTFLOAT *out, SUINTFLOAT *in)
 
 static int handle_crc(MPADecodeContext *s, int sec_len)
 {
-    if (s->error_protection && (s->err_recognition & AV_EF_CRCCHECK))
-    {
-        const uint8_t *buf = s->gb.buffer - HEADER_SIZE;
-        int sec_byte_len = sec_len >> 3;
-        int sec_rem_bits = sec_len & 7;
-        const AVCRC *crc_tab = av_crc_get_table(AV_CRC_16_ANSI);
-        uint8_t tmp_buf[4];
-        uint32_t crc_val = av_crc(crc_tab, UINT16_MAX, &buf[2], 2);
-        crc_val = av_crc(crc_tab, crc_val, &buf[6], sec_byte_len);
-
-        AV_WB32(tmp_buf,
-                ((buf[6 + sec_byte_len] & (0xFF00U >> sec_rem_bits)) << 24) +
-                    ((s->crc << 16) >> sec_rem_bits));
-
-        crc_val = av_crc(crc_tab, crc_val, tmp_buf, 3);
-
-        if (crc_val)
-        {
-            av_log(s->avctx, AV_LOG_ERROR, "CRC mismatch %X!\n", crc_val);
-            if (s->err_recognition & AV_EF_EXPLODE)
-                return AVERROR_INVALIDDATA;
-        }
-    }
+    
     return 0;
 }
 
